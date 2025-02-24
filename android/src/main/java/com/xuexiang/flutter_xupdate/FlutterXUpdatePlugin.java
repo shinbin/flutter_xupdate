@@ -25,7 +25,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /**
  * FlutterXUpdatePlugin
@@ -52,13 +51,6 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
         mMethodChannel.setMethodCallHandler(null);
         mMethodChannel = null;
-    }
-
-    public FlutterXUpdatePlugin initPlugin(MethodChannel methodChannel, Registrar registrar) {
-        mMethodChannel = methodChannel;
-        mApplication = (Application) registrar.context().getApplicationContext();
-        mActivity = new WeakReference<>(registrar.activity());
-        return this;
     }
 
     @Override
@@ -150,6 +142,7 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
     private void checkUpdate(MethodCall call, Result result) {
         if (mActivity == null || mActivity.get() == null) {
             result.error("1001", "Not attach a Activity", null);
+            return;
         }
 
         String url = call.argument("url");
@@ -193,6 +186,7 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
     private void updateByInfo(MethodCall call, Result result) {
         if (mActivity == null || mActivity.get() == null) {
             result.error("1001", "Not attach a Activity", null);
+            return;
         }
 
         HashMap<String, Object> map = call.argument("updateEntity");
@@ -275,27 +269,22 @@ public class FlutterXUpdatePlugin implements FlutterPlugin, ActivityAware, Metho
 
 
     @Override
-    public void onAttachedToActivity(ActivityPluginBinding binding) {
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         mActivity = new WeakReference<>(binding.getActivity());
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-
+        mActivity = null;
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        mActivity = new WeakReference<>(binding.getActivity());
     }
 
     @Override
     public void onDetachedFromActivity() {
         mActivity = null;
-    }
-
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), PLUGIN_NAME);
-        channel.setMethodCallHandler(new FlutterXUpdatePlugin().initPlugin(channel, registrar));
     }
 }

@@ -64,10 +64,10 @@ class _MyAppState extends State<MyApp> {
       });
 
 //      FlutterXUpdate.setErrorHandler(
-//          onUpdateError: (Map<String, dynamic> message) async {
+//          onUpdateError: (Map<String, dynamic>? message) async {
 //        print(message);
 //        //下载失败
-//        if (message["code"] == 4000) {
+//        if (message != null && message["code"] == 4000) {
 //          FlutterXUpdate.showRetryUpdateTipDialog(
 //              retryContent: "Github被墙无法继续下载，是否考虑切换蒲公英下载？",
 //              retryUrl: "https://www.pgyer.com/flutter_learn");
@@ -77,16 +77,16 @@ class _MyAppState extends State<MyApp> {
 //        });
 //      });
 
-//      FlutterXUpdate.setCustomParseHandler(onUpdateParse: (String json) async {
+//      FlutterXUpdate.setCustomParseHandler(onUpdateParse: (String? json) async {
 //        //这里是自定义json解析
 //        return customParseJson(json);
 //      });
 
       FlutterXUpdate.setUpdateHandler(
-          onUpdateError: (Map<String, dynamic> message) async {
+          onUpdateError: (Map<String, dynamic>? message) async {
         print(message);
         //下载失败
-        if (message["code"] == 4000) {
+        if (message != null && message["code"] == 4000) {
           FlutterXUpdate.showRetryUpdateTipDialog(
               retryContent: 'Github被墙无法继续下载，是否考虑切换蒲公英下载？',
               retryUrl: 'https://www.pgyer.com/flutter_learn');
@@ -94,7 +94,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _message = '$message';
         });
-      }, onUpdateParse: (String json) async {
+      }, onUpdateParse: (String? json) async {
         //这里是自定义json解析
         return customParseJson(json);
       });
@@ -110,17 +110,26 @@ class _MyAppState extends State<MyApp> {
   }
 
   ///将自定义的json内容解析为UpdateEntity实体类
-  UpdateEntity customParseJson(String json) {
-    AppInfo appInfo = AppInfo.fromJson(json);
+  UpdateEntity customParseJson(String? json) {
+    if (json == null) {
+      return UpdateEntity(
+        hasUpdate: false,
+        versionCode: 0,
+        versionName: '',
+        updateContent: '',
+        downloadUrl: '',
+      );
+    }
+    AppInfo? appInfo = AppInfo.fromJson(json);
     print(appInfo);
     return UpdateEntity(
-        hasUpdate: appInfo.hasUpdate,
-        isIgnorable: appInfo.isIgnorable,
-        versionCode: appInfo.versionCode,
-        versionName: appInfo.versionName,
-        updateContent: appInfo.updateLog,
-        downloadUrl: appInfo.apkUrl,
-        apkSize: appInfo.apkSize);
+        hasUpdate: appInfo?.hasUpdate,
+        isIgnorable: appInfo?.isIgnorable,
+        versionCode: appInfo?.versionCode,
+        versionName: appInfo?.versionName,
+        updateContent: appInfo?.updateLog,
+        downloadUrl: appInfo?.apkUrl,
+        apkSize: appInfo?.apkSize);
   }
 
   @override
@@ -144,113 +153,108 @@ class _MyAppState extends State<MyApp> {
                       style:
                           const TextStyle(color: Colors.white, fontSize: 12)),
                 ),
-                autoFitWidget(ButtonBar(
+                autoFitWidget(OverflowBar(
                   alignment:
                       MainAxisAlignment.start, //布局方向，默认MainAxisAlignment.end
-                  mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                   children: <Widget>[
                     ElevatedButton(
                       child: const Text('默认App更新'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateDefault,
                     ),
                     ElevatedButton(
                       child: const Text('默认App更新 + 支持后台更新'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateSupportBackground,
                     ),
                   ],
                 )),
-                autoFitWidget(ButtonBar(
+                autoFitWidget(OverflowBar(
                   alignment:
                       MainAxisAlignment.start, //布局方向，默认MainAxisAlignment.end
-                  mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                   children: <Widget>[
                     ElevatedButton(
                       child: const Text('调整宽高比'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateRatio,
                     ),
                     ElevatedButton(
                       child: const Text('强制更新'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateForce,
                     ),
                     ElevatedButton(
                       child: const Text('自动模式'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateAutoMode,
                     ),
                   ],
                 )),
-                autoFitWidget(ButtonBar(
+                autoFitWidget(OverflowBar(
                   alignment:
                       MainAxisAlignment.start, //布局方向，默认MainAxisAlignment.end
-                  mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                   children: <Widget>[
                     ElevatedButton(
                       child: const Text('下载时点击取消允许切换下载方式'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: enableChangeDownLoadType,
                     ),
                     ElevatedButton(
                       child: const Text('显示重试提示弹窗'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: showRetryDialogTip,
                     ),
                   ],
                 )),
-                autoFitWidget(ButtonBar(
+                autoFitWidget(OverflowBar(
                   alignment:
                       MainAxisAlignment.start, //布局方向，默认MainAxisAlignment.end
-                  mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                   children: <Widget>[
                     ElevatedButton(
                       child: const Text('使用自定义json解析'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: customJsonParse,
                     ),
                     ElevatedButton(
                       child: const Text('直接传入UpdateEntity进行更新'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: checkUpdateByUpdateEntity,
                     ),
                   ],
                 )),
-                autoFitWidget(ButtonBar(
+                autoFitWidget(OverflowBar(
                   alignment:
                       MainAxisAlignment.start, //布局方向，默认MainAxisAlignment.end
-                  mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                   children: <Widget>[
                     ElevatedButton(
                       child: const Text('自定义更新弹窗样式'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: customPromptDialog,
                     ),
                     ElevatedButton(
                       child: const Text('定时更新'),
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
+                          backgroundColor: WidgetStateProperty.all(
                               Theme.of(context).primaryColor)),
                       onPressed: timerUpdateTask,
                     ),

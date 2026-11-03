@@ -273,7 +273,8 @@ class FlutterXUpdate {
     if (hasUpdate) {
       final PackageInfo packageInfo = await PackageInfo.fromPlatform();
       //服务器返回的最新版本小于等于现在的版本，不需要更新
-      if (updateInfo.versionCode! <= int.parse(packageInfo.buildNumber)) {
+      final int currentVersionCode = int.tryParse(packageInfo.buildNumber) ?? 0;
+      if (updateInfo.versionCode! <= currentVersionCode) {
         hasUpdate = false;
       }
     }
